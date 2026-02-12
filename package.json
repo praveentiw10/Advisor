@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "A full-stack financial advisor application with authentication and stock market features",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "start": "node backend/src/index.js",
+    "dev": "nodemon backend/src/index.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
