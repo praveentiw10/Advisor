@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Modern UI</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at 70% 30%, #1e1b4b 0%, #020617 100%);
+            overflow: hidden;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 380px;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        h2 {
+            color: white;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.12);
+            border-radius: 50px;
+            margin-bottom: 25px;
+            padding: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .input-group input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #ffffff;
+            padding: 12px 20px;
+            width: 100%;
+            font-size: 16px;
+        }
+
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+
+        .icon-circle {
+            background: white;
+            min-width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .icon-circle span {
+            font-size: 18px;
+            filter: grayscale(1);
+        }
+
+
+        .submit-btn {
+            width: 100%;
+            background-color: white;
+            color: #012b32;
+            border: none;
+            padding: 16px;
+            border-radius: 50px;
+            font-weight: 900;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            text-transform: uppercase;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .submit-btn:hover {
+            background-color: #f0f0f0;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+
+        .signup-link {
+            display: block;
+            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .signup-link:hover {
+            color: white;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-card">
+        <h2>USER LOGIN</h2>
+
+        <form action="/login" method="post">
+
+            <div class="input-group">
+                <div class="icon-circle">
+                    <span>👤</span>
+                </div>
+                <input type="text" name="name" placeholder="Username" required>
+            </div>
+
+            <div class="input-group">
+                <input type="password" name="password" placeholder="Password" required>
+                <div class="icon-circle">
+                    <span>🔒</span>
+                </div>
+            </div>
+
+            <input type="submit" value="LOGIN" class="submit-btn">
+
+        </form>
+
+        <a href="/signup" class="signup-link">Make a new account</a>
+    </div>
+
+</body>
+
+</html>
