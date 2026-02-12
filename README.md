@@ -1,6 +1,6 @@
-# Login & Signup Tutorial
+# Advisor
 
-A full-stack authentication application with login and signup functionality.
+A full-stack financial advisor application with authentication and stock market features.
 
 ## Features
 
@@ -29,7 +29,7 @@ A full-stack authentication application with login and signup functionality.
 ## Project Structure
 
 ```
-LogInSignUpTutorial/
+advisor/
 ├── backend/
 │   └── src/
 │       ├── index.js          # Main server file
@@ -45,8 +45,8 @@ LogInSignUpTutorial/
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/praveentiw10/LogInSignUpTutorial.git
-cd LogInSignUpTutorial
+git clone https://github.com/praveentiw10/advisor.git
+cd advisor
 ```
 
 2. Install dependencies:
