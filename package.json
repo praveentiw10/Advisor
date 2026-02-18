@@ -7,16 +7,31 @@
     "dev": "nodemon backend/src/index.js"
   },
   "dependencies": {
-    "bcrypt": "^6.0.0",
+    "apexcharts": "^5.4.0",
+    "bcryptjs": "^3.0.3",
+    "clsx": "^2.1.1",
     "cors": "^2.8.6",
+    "countup.js": "^2.9.0",
     "dotenv": "^17.2.4",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "finnhub": "^2.0.13",
+    "framer-motion": "^12.34.0",
     "hbs": "^4.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.564.0",
     "mongodb": "^7.1.0",
     "mongoose": "^9.2.0",
     "node-fetch": "^3.3.2",
-    "nodemon": "^3.1.11"
+    "nodemailer": "^6.9.16",
+    "nodemon": "^3.1.11",
+    "react-apexcharts": "^1.9.0",
+    "react-router-dom": "^7.13.0",
+    "tailwind-merge": "^3.4.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.24",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18"
   }
 }

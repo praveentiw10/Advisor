@@ -1,18 +1,29 @@
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, "../.env") });
 
 const express = require("express");
 const app = express();
 const finnhub = require("finnhub");
-const path = require("path");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
+
 
 app.use(express.static(path.join(__dirname, '../../frontend/public')));
 
 const hbs = require("hbs");
-require("./config/db");
+const mongoose = require("./config/db");
 const User = require("./models/User");
 
 const templatePath = path.join(__dirname, "../../frontend/views");
+
+const authApiRoutes = require("./routes/authApiRoutes");
+const authRoutes = require("./routes/authRoutes");
+const session = require("express-session");
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'secret',
+  resave: false,
+  saveUninitialized: false
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -20,53 +31,13 @@ app.use(express.urlencoded({ extended: false }));
 app.set("view engine", "hbs");
 app.set("views", templatePath);
 
-const finnhubClient = new finnhub.DefaultApi({
-  apiKey: process.env.API_KEY
-});
+// Session Routes (for forms)
+app.use("/", authRoutes);
+
+// Auth API: POST /api/auth/login, forgot-password, verify-otp, reset-password, GET /api/auth/me
+app.use("/api/auth", authApiRoutes);
 
 
-app.get("/", (req, res) => { res.render("landing"); });
-app.get("/login", (req, res) => { res.render("login"); });
-app.get("/signup", (req, res) => { res.render("signup"); });
-
-app.post("/signup", async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
-    const user = new User({ name, email, password });
-    await user.save();
-    res.redirect("/home");
-  } catch (err) {
-    console.error("Signup Error:", err);
-    if (err.name === 'MongooseError' && err.message.includes('buffering timed out')) {
-      res.status(503).send("Database connection timeout. Please check if your IP is whitelisted in MongoDB Atlas.");
-    } else if (err.code === 11000) {
-      res.status(400).send("User already exists with this email.");
-    } else {
-      res.status(500).send("Error during signup: " + err.message);
-    }
-  }
-});
-
-app.post("/login", async (req, res) => {
-  try {
-    const user = await User.findOne({ name: req.body.name });
-    if (user) {
-      const isMatch = await bcrypt.compare(req.body.password, user.password);
-      if (isMatch) {
-        res.redirect("/home");
-      } else {
-        res.send("Wrong password");
-      }
-    } else {
-      res.send("User not found");
-    }
-  } catch (err) {
-    console.error("Login Error:", err);
-    res.status(500).send("Login error: " + err.message);
-  }
-});
-
-// Root route to check server status
 app.get("/status", (req, res) => {
   const status = mongoose.connection.readyState === 1 ? "Connected" : "Disconnected";
   res.json({

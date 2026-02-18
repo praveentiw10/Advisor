@@ -5,8 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - Create Account</title>
-
+    <title>Sign Up - Modern UI</title>
     <style>
         * {
             box-sizing: border-box;
@@ -21,9 +20,10 @@
             justify-content: center;
             align-items: center;
             background: radial-gradient(circle at 70% 30%, #1e1b4b 0%, #020617 100%);
+            overflow: hidden;
         }
 
-        .signup-card {
+        .login-card {
             width: 100%;
             max-width: 380px;
             padding: 40px 20px;
@@ -39,8 +39,8 @@
             text-transform: uppercase;
         }
 
-
         .input-group {
+            position: relative;
             display: flex;
             align-items: center;
             background-color: rgba(255, 255, 255, 0.12);
@@ -50,21 +50,19 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-
         .input-group input {
-            flex: 1;
             background: transparent;
             border: none;
             outline: none;
             color: #ffffff;
             padding: 12px 20px;
+            width: 100%;
             font-size: 16px;
         }
 
         .input-group input::placeholder {
             color: rgba(255, 255, 255, 0.5);
         }
-
 
         .icon-circle {
             background: white;
@@ -75,13 +73,12 @@
             justify-content: center;
             align-items: center;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .icon-circle span {
             font-size: 18px;
+            filter: grayscale(1);
         }
-
-        / .icon-right {
-            flex-direction: row-reverse;
-        }
-
 
         .submit-btn {
             width: 100%;
@@ -96,59 +93,120 @@
             transition: all 0.3s ease;
             margin-top: 10px;
             text-transform: uppercase;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
 
         .submit-btn:hover {
             background-color: #f0f0f0;
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
         }
 
-        .login-link {
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .signup-link {
             display: block;
             margin-top: 30px;
             color: rgba(255, 255, 255, 0.6);
             text-decoration: none;
             font-size: 14px;
+            transition: color 0.3s;
         }
 
-        .login-link:hover {
+        .signup-link:hover {
             color: white;
+            text-decoration: underline;
+        }
+
+        .error-msg {
+            color: #f87171;
+            font-size: 14px;
+            margin-bottom: 12px;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="signup-card">
+    <div class="login-card">
         <h2>SIGN UP</h2>
 
-        <form action="/signup" method="POST">
-
-
-            <div class="input-group">
-                <div class="icon-circle">👤</div>
-                <input type="text" name="name" placeholder="Name" required>
-            </div>
-
-
-            <div class="input-group icon-right">
-                <div class="icon-circle">📧</div>
-                <input type="email" name="email" placeholder="Email Address" required>
-            </div>
-
+        <form id="signupForm">
+            <p id="jsError" class="error-msg" style="display: none;"></p>
 
             <div class="input-group">
-                <div class="icon-circle">🔒</div>
-                <input type="password" name="password" placeholder="Password" required>
+                <div class="icon-circle">
+                    <span>👤</span>
+                </div>
+                <input type="text" name="name" id="name" placeholder="Name" required>
             </div>
 
-            <button type="submit" class="submit-btn">SIGN UP</button>
+            <div class="input-group">
+                <div class="icon-circle">
+                    <span>✉️</span>
+                </div>
+                <input type="email" name="email" id="email" placeholder="Email Address" required>
+            </div>
 
+            <div class="input-group">
+                <input type="password" name="password" id="password" placeholder="Password" required>
+                <div class="icon-circle">
+                    <span>🔒</span>
+                </div>
+            </div>
+
+            <input type="submit" value="SIGN UP" class="submit-btn">
         </form>
 
-        <a href="/login" class="login-link">Already have an account? Login</a>
+        <a href="/login" class="signup-link">Already have an account? Login</a>
     </div>
+
+    <script>
+        (function () {
+            const form = document.getElementById('signupForm');
+            const jsError = document.getElementById('jsError');
+
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                jsError.style.display = 'none';
+                jsError.textContent = '';
+                var name = document.getElementById('name').value.trim();
+                var email = document.getElementById('email').value.trim().toLowerCase();
+                var password = document.getElementById('password').value;
+                if (!name || !email || !password) {
+                    jsError.textContent = 'Please fill all fields.';
+                    jsError.style.display = 'block';
+                    return;
+                }
+                if (password.length < 6) {
+                    jsError.textContent = 'Password must be at least 6 characters.';
+                    jsError.style.display = 'block';
+                    return;
+                }
+                try {
+                    var res = await fetch('/api/auth/signup', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: name, email: email, password: password })
+                    });
+                    var data = await res.json();
+                    if (data.success) {
+                        sessionStorage.setItem('token', data.token);
+                        sessionStorage.setItem('user', JSON.stringify(data.user));
+                        window.location.href = '/home';
+                    } else {
+                        jsError.textContent = data.message || 'Sign up failed.';
+                        jsError.style.display = 'block';
+                    }
+                } catch (err) {
+                    jsError.textContent = 'Network error. Try again.';
+                    jsError.style.display = 'block';
+                }
+            });
+        })();
+    </script>
 
 </body>
 

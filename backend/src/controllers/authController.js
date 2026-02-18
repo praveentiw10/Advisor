@@ -1,5 +1,6 @@
 const User = require('../models/User');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
+const { sendWelcomeEmail } = require('../utils/email');
 
 exports.getLanding = (req, res) => {
     res.render("landing");
@@ -11,6 +12,10 @@ exports.getLogin = (req, res) => {
 
 exports.getSignup = (req, res) => {
     res.render("signup");
+};
+
+exports.getForgotPassword = (req, res) => {
+    res.render("forgot-password");
 };
 
 exports.getHome = (req, res) => {
@@ -27,6 +32,11 @@ exports.postSignup = async (req, res) => {
         const newUser = new User(data);
         await newUser.save();
 
+        // Send welcome email asynchronously (don't block the response)
+        sendWelcomeEmail(newUser.email, newUser.name).catch(err => {
+            console.error('Failed to send welcome email:', err);
+        });
+
         // Initialize session
         req.session.userId = newUser._id;
         req.session.userName = newUser.name;
@@ -37,6 +47,7 @@ exports.postSignup = async (req, res) => {
         res.status(500).send("Error signing up");
     }
 };
+
 
 exports.postLogin = async (req, res) => {
     try {

@@ -7,7 +7,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet">
 
   <style>
     :root {
@@ -295,7 +297,7 @@
         font-size: 14px;
       }
 
-      / .stats {
+      .stats {
         flex-direction: column;
         gap: 15px;
         margin-top: 25px;
@@ -650,7 +652,7 @@
 
 </body>
 <script>
-  const API_KEY = "d60plgpr01qto1rdvorgd60plgpr01qto1rdvos0";
+
 
 
   const MARKET_ASSETS = [
@@ -678,12 +680,14 @@
     ticker.appendChild(div);
   });
 
+  // Clone items for seamless loop
+  const items = ticker.innerHTML;
+  ticker.innerHTML += items;
+
 
   async function fetchQuote(asset) {
     try {
-      const res = await fetch(
-        `https://finnhub.io/api/v1/quote?symbol=${asset.symbol}&token=${API_KEY}`
-      );
+      const res = await fetch(`/api/stock/${asset.symbol}`);
       const data = await res.json();
       if (!data.c) return;
 
@@ -691,10 +695,12 @@
       const change = data.dp.toFixed(2);
 
       const id = asset.symbol.replace(/[^a-zA-Z0-9]/g, "");
-      const span = document.querySelector(`#${id} span`);
+      const spans = document.querySelectorAll(`#${id} span`);
 
-      span.textContent = `${asset.currency}${price} (${change}%)`;
-      span.className = change >= 0 ? "up" : "down";
+      spans.forEach(span => {
+        span.textContent = `${asset.currency}${price} (${change}%)`;
+        span.className = change >= 0 ? "up" : "down";
+      });
 
     } catch (e) {
       console.error("Error loading:", asset.symbol);
