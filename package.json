@@ -7,6 +7,7 @@
     "dev": "nodemon backend/src/index.js"
   },
   "dependencies": {
+    "@paypal/paypal-server-sdk": "^2.2.0",
     "apexcharts": "^5.4.0",
     "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
@@ -23,8 +24,9 @@
     "mongodb": "^7.1.0",
     "mongoose": "^9.2.0",
     "node-fetch": "^3.3.2",
-    "nodemailer": "^6.9.16",
+    "nodemailer": "^6.10.1",
     "nodemon": "^3.1.11",
+    "razorpay": "^2.9.6",
     "react-apexcharts": "^1.9.0",
     "react-router-dom": "^7.13.0",
     "tailwind-merge": "^3.4.1"

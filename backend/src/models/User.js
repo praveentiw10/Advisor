@@ -6,7 +6,9 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, lowercase: true },
   password: { type: String, required: true },
   otp: { type: String, default: null },
-  otpExpiry: { type: Date, default: null }
+  otpExpiry: { type: Date, default: null },
+  cashBalance: { type: Number, default: 100000 },
+  watchlist: { type: [String], default: ['AAPL', 'TSLA', 'NVDA', 'MSFT', 'GOOGL', 'BTC'] }
 }, { timestamps: true });
 
 // Hash password before saving (only when password is modified)

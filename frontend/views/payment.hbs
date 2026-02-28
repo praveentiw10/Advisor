@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funds Management - ADVISOR</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script
+        src="https://www.paypal.com/sdk/js?client-id=AaPW-38m8YpFcGsdJXFtyDbj1EWnkbKTXhbZqG4xkKOK7b0HJ8ySlg_IbJOQGHDC1dLHhrNVNWJFeHwn&currency=USD"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --bg-gradient: radial-gradient(circle at 70% 30%, #1e1b4b 0%, #020617 100%);
+            --sidebar-bg: #030712;
+            --bg-card: rgba(15, 23, 42, 0.6);
+            --accent: #22d3ee;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --green: #4ade80;
+            --red: #fb7185;
+            --border-line: rgba(255, 255, 255, 0.1);
+            --card-item-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .payment-container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--bg-card);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--border-line);
+            border-radius: 32px;
+            padding: 40px;
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.8);
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo {
+            font-size: 36px;
+            font-weight: 950;
+            color: var(--accent);
+            letter-spacing: 6px;
+            margin-bottom: 8px;
+            display: block;
+            text-shadow: 0 0 30px rgba(34, 211, 238, 0.5);
+        }
+
+        .tabs {
+            display: flex;
+            background: var(--card-item-bg);
+            padding: 6px;
+            border-radius: 20px;
+            margin-bottom: 32px;
+            border: 1px solid var(--border-line);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 14px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .tab.active {
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(34, 211, 238, 0.4);
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .amount-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .amount-option {
+            background: var(--card-item-bg);
+            border: 1px solid var(--border-line);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .amount-option:hover {
+            border-color: var(--accent);
+            background: rgba(34, 211, 238, 0.08);
+        }
+
+        .amount-option.active {
+            border-color: var(--accent);
+            background: rgba(34, 211, 238, 0.15);
+            box-shadow: 0 0 0 1px var(--accent);
+        }
+
+        .amount-option span {
+            display: block;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .input-wrapper input,
+        .input-wrapper select {
+            width: 100%;
+            background: var(--card-item-bg);
+            border: 1px solid var(--border-line);
+            border-radius: 18px;
+            padding: 18px 18px 18px 48px;
+            color: var(--text-main);
+            font-size: 16px;
+            font-weight: 600;
+            outline: none;
+        }
+
+        .input-wrapper select option {
+            background-color: var(--sidebar-bg);
+            color: var(--text-main);
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.15);
+        }
+
+        .btn-action {
+            width: 100%;
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 20px;
+            border-radius: 18px;
+            font-size: 16px;
+            font-weight: 900;
+            cursor: pointer;
+            margin-top: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 20px 40px -10px rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 25px 50px -12px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Success Overlay */
+        .success-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #000;
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .success-overlay i {
+            font-size: 100px;
+            color: var(--green);
+            margin-bottom: 32px;
+            filter: drop-shadow(0 0 30px rgba(74, 222, 128, 0.5));
+        }
+
+        /* History Table */
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+        }
+
+        .txn-card {
+            background: var(--card-item-bg);
+            border: 1px solid var(--border-line);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .txn-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .txn-type {
+            font-size: 14px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .txn-date {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .txn-amt {
+            font-size: 18px;
+            font-weight: 900;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .status-pill {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .status-completed {
+            background: rgba(74, 222, 128, 0.2);
+            color: var(--green);
+        }
+
+        .status-pending {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        .balance-badge {
+            background: rgba(34, 211, 238, 0.1);
+            color: var(--accent);
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 14px;
+            margin-bottom: 24px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid rgba(34, 211, 238, 0.2);
+        }
+
+        .alert {
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .alert-error {
+            background: rgba(251, 113, 133, 0.1);
+            border: 1px solid var(--red);
+            color: var(--red);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="payment-container">
+        <!-- Success Overlay with Full Receipt -->
+        <div id="success-overlay" class="success-overlay">
+            <i class="fas fa-check-circle"></i>
+            <h2 id="success-title">Transaction Complete</h2>
+            <p id="success-message" style="color: var(--text-muted); margin: 10px 0 20px 0;">Your receipt has been generated</p>
+            <div id="payment-receipt-content" style="background: var(--card-item-bg); padding: 24px; border-radius: 20px; width: 100%; max-width: 420px; text-align: left; border: 1px solid var(--border-line); margin-bottom: 20px;">
+                <table style="width:100%; font-size: 13px; border-collapse: collapse;">
+                    <tr><td style="padding:10px 0; color: var(--text-muted);">Ref #</td><td style="padding:10px 0; text-align:right; font-weight: 700;" id="receipt-ref"></td></tr>
+                    <tr><td style="padding:10px 0; color: var(--text-muted);">Date</td><td style="padding:10px 0; text-align:right;" id="receipt-date"></td></tr>
+                    <tr><td style="padding:10px 0; color: var(--text-muted);">Type</td><td style="padding:10px 0; text-align:right; font-weight: 700;" id="receipt-type"></td></tr>
+                    <tr><td style="padding:10px 0; color: var(--text-muted);">Amount</td><td style="padding:10px 0; text-align:right; font-weight: 900; font-size: 20px;" id="receipt-amount"></td></tr>
+                    <tr><td style="padding:10px 0; color: var(--text-muted);">Method</td><td style="padding:10px 0; text-align:right;" id="receipt-method"></td></tr>
+                    <tr><td style="padding:10px 0; color: var(--text-muted);">To / From</td><td style="padding:10px 0; text-align:right;" id="receipt-recipient"></td></tr>
+                    <tr><td style="padding:10px 0; color: var(--text-muted);">Status</td><td style="padding:10px 0; text-align:right;"><span id="receipt-status" style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 8px; text-transform: uppercase;"></span></td></tr>
+                    <tr><td style="padding:14px 0 10px; color: var(--text-muted); border-top: 1px solid var(--border-line);">New Balance</td><td style="padding:14px 0 10px; text-align:right; font-weight: 900; color: var(--accent); font-size: 18px; border-top: 1px solid var(--border-line);" id="receipt-balance"></td></tr>
+                </table>
+            </div>
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
+                <button onclick="printPaymentReceipt()" class="btn-action" style="width: auto; padding: 14px 24px; background: rgba(255,255,255,0.1);">
+                    <i class="fas fa-print"></i> Print Receipt
+                </button>
+                <button onclick="downloadPaymentReceipt()" class="btn-action" style="width: auto; padding: 14px 24px; background: rgba(255,255,255,0.1);">
+                    <i class="fas fa-download"></i> Save PDF
+                </button>
+            </div>
+            <button onclick="window.location.href='/home'" class="btn-action" style="background: var(--accent);">Go to Terminal</button>
+        </div>
+
+        <div class="header">
+            <span class="logo">ADVISOR</span>
+            <div id="balance-container" class="balance-badge">
+                <i class="fas fa-wallet"></i> Balance: <span id="current-balance-top">Loading...</span>
+            </div>
+            <p id="main-subtitle" style="color: var(--text-muted); font-size: 14px;">Capital & Withdrawal Management</p>
+        </div>
+
+        <div id="alert-box" class="alert alert-error"></div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('deposit')">Deposit</div>
+            <div class="tab" onclick="switchTab('withdraw')">Withdraw</div>
+            <div class="tab" onclick="switchTab('history')">History</div>
+        </div>
+
+        <!-- Deposit Page -->
+        <div id="deposit-page" class="page active">
+            <div class="amount-selector">
+                <div class="amount-option" data-amount="1000"><span>$1,000</span></div>
+                <div class="amount-option" data-amount="5000"><span>$5,000</span></div>
+                <div class="amount-option" data-amount="10000"><span>$10,000</span></div>
+                <div class="amount-option" data-amount="25000"><span>$25,000</span></div>
+            </div>
+
+            <div class="input-group">
+                <label>Deposit Amount (USD)</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-dollar-sign"></i>
+                    <input type="number" id="deposit-amount" value="5000">
+                </div>
+            </div>
+
+            <div style="margin: 30px 0;">
+                <div id="paypal-button-container"></div>
+            </div>
+
+            <p style="font-size: 12px; color: var(--text-muted); text-align: center;">
+                <i class="fas fa-shield-halved"></i> Secured by PayPal Encryption
+            </p>
+        </div>
+
+        <!-- Withdraw Page -->
+        <div id="withdraw-page" class="page">
+            <div class="input-group">
+                <label>Withdrawal Amount</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-dollar-sign"></i>
+                    <input type="number" id="withdraw-amount" placeholder="Min. $10">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Target Channel</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-link"></i>
+                    <select id="withdraw-method" onchange="updateWithdrawMode()">
+                        <option value="UPI">UPI Transfer (Instant)</option>
+                        <option value="CARD">Visa / Mastercard</option>
+                        <option value="BANK">International Wire</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label id="details-label">UPI Address</label>
+                <div class="input-wrapper">
+                    <i id="details-icon" class="fas fa-at"></i>
+                    <input type="text" id="details-input" placeholder="id@bank">
+                </div>
+            </div>
+
+            <button class="btn-action" onclick="handleWithdraw()">
+                <i class="fas fa-paper-plane"></i> Initiate Withdrawal
+            </button>
+        </div>
+
+        <!-- History Page -->
+        <div id="history-page" class="page">
+            <div class="history-list" id="transaction-list">
+                <p style="text-align: center; color: var(--text-muted); padding: 50px;">Fetching logs...</p>
+            </div>
+        </div>
+
+        <a href="/home"
+            style="display: block; text-align: center; margin-top: 32px; color: var(--text-muted); text-decoration: none; font-size: 13px; font-weight: 700;">
+            <i class="fas fa-arrow-left" style="font-size: 10px; margin-right: 8px;"></i> Return to Dashboard
+        </a>
+    </div>
+
+    <script>
+        let currentAmt = 5000;
+
+        function switchTab(t) {
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+
+            const idx = t === 'deposit' ? 1 : (t === 'withdraw' ? 2 : 3);
+            document.querySelector(`.tab:nth-child(${idx})`).classList.add('active');
+            document.getElementById(`${t}-page`).classList.add('active');
+
+            if (t === 'history') loadHistory();
+            document.getElementById('alert-box').style.display = 'none';
+        }
+
+        function updateWithdrawMode() {
+            const m = document.getElementById('withdraw-method').value;
+            const label = document.getElementById('details-label');
+            const placeholder = document.getElementById('details-input');
+            const icon = document.getElementById('details-icon');
+
+            if (m === 'UPI') {
+                label.innerText = 'UPI Address';
+                placeholder.placeholder = 'example@upi';
+                icon.className = 'fas fa-at';
+            } else if (m === 'CARD') {
+                label.innerText = 'Card Number';
+                placeholder.placeholder = 'XXXX XXXX XXXX XXXX';
+                icon.className = 'fas fa-credit-card';
+            } else {
+                label.innerText = 'Bank IBAN / Swift';
+                placeholder.placeholder = 'Bank A/C details';
+                icon.className = 'fas fa-university';
+            }
+        }
+
+        let currentPaymentReceipt = null;
+        function showReceipt(receipt) {
+            if (!receipt) return;
+            currentPaymentReceipt = receipt;
+            const fmt = (n) => '$' + (n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const isDeposit = receipt.type === 'DEPOSIT';
+            document.getElementById('receipt-ref').innerText = (receipt.referenceId || receipt.id || '').toString().toUpperCase();
+            document.getElementById('receipt-date').innerText = new Date(receipt.date).toLocaleString();
+            document.getElementById('receipt-type').innerText = receipt.type;
+            document.getElementById('receipt-type').style.color = isDeposit ? 'var(--green)' : 'var(--red)';
+            document.getElementById('receipt-amount').innerText = (isDeposit ? '+' : '-') + fmt(receipt.amount);
+            document.getElementById('receipt-amount').style.color = isDeposit ? 'var(--green)' : 'var(--red)';
+            document.getElementById('receipt-method').innerText = receipt.method || '—';
+            document.getElementById('receipt-recipient').innerText = receipt.recipient || '—';
+            const s = document.getElementById('receipt-status');
+            s.innerText = receipt.status || 'COMPLETED';
+            s.style.background = (receipt.status || '').toLowerCase() === 'completed' ? 'rgba(74,222,128,0.2)' : 'rgba(251,191,36,0.2)';
+            s.style.color = (receipt.status || '').toLowerCase() === 'completed' ? 'var(--green)' : '#fbbf24';
+            document.getElementById('receipt-balance').innerText = fmt(receipt.newBalance);
+        }
+        function printPaymentReceipt() {
+            const el = document.getElementById('payment-receipt-content');
+            if (!el) return;
+            const win = window.open('', '_blank');
+            win.document.write('<html><head><title>Payment Receipt - ADVISOR</title><style>body{font-family:Inter,sans-serif;background:#020617;color:#f8fafc;padding:40px;} table{width:100%;} td{padding:10px 0;} .muted{color:#94a3b8;}</style></head><body><h2>ADVISOR - Payment Receipt</h2>' + el.outerHTML + '<p style="margin-top:24px;font-size:11px;color:#64748b;">' + new Date().toLocaleString() + '</p></body></html>');
+            win.document.close();
+            win.print();
+            win.close();
+        }
+        function downloadPaymentReceipt() {
+            if (typeof html2pdf === 'undefined') { alert('PDF library loading. Please try again.'); return; }
+            const el = document.getElementById('payment-receipt-content');
+            if (!el) return;
+            html2pdf().set({ margin: 16, filename: 'Advisor_Receipt_' + (currentPaymentReceipt?.referenceId || Date.now()) + '.pdf' }).from(el).save();
+        }
+
+        // Balance Sync
+        async function fetchBalance() {
+            const r = await fetch('/api/portfolio', { credentials: 'include' });
+            const d = await r.json();
+            if (d.success) {
+                const bal = '$' + d.portfolio.cashBalance.toLocaleString(undefined, { minimumFractionDigits: 2 });
+                document.getElementById('current-balance-top').innerText = bal;
+            }
+        }
+        fetchBalance();
+
+        // Amount buttons
+        document.querySelectorAll('.amount-option').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Clear active from all options
+                document.querySelectorAll('.amount-option').forEach(b => {
+                    b.classList.remove('active');
+                });
+                // Set active to clicked one
+                btn.classList.add('active');
+                currentAmt = btn.dataset.amount;
+                document.getElementById('deposit-amount').value = currentAmt;
+            });
+        });
+
+        document.getElementById('deposit-amount').addEventListener('input', (e) => {
+            currentAmt = e.target.value;
+            document.querySelectorAll('.amount-option').forEach(b => b.classList.remove('active'));
+        });
+
+        // PayPal
+        paypal.Buttons({
+            createOrder: (data, actions) => {
+                return fetch('/create-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ amount: currentAmt })
+                }).then(res => res.json()).then(o => o.id);
+            },
+            onApprove: (data, actions) => {
+                return fetch('/capture-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ orderID: data.orderID })
+                }).then(res => res.json()).then(d => {
+                    if (d.success) {
+                        document.getElementById('success-title').innerText = 'Deposit Successful';
+                        document.getElementById('success-message').innerText = 'Funds credited to your trading account.';
+                        if (d.receipt) showReceipt(d.receipt);
+                        else showReceipt({ type: 'DEPOSIT', amount: currentAmt, newBalance: d.newBalance, method: 'PAYPAL', recipient: 'PayPal', status: 'COMPLETED', date: new Date(), referenceId: 'PAYPAL', id: d.transactionId });
+                        document.getElementById('success-overlay').style.display = 'flex';
+                    } else alert(d.message || 'Payment failed');
+                });
+            }
+        }).render('#paypal-button-container');
+
+        // Withdraw
+        async function handleWithdraw() {
+            const amount = document.getElementById('withdraw-amount').value;
+            const method = document.getElementById('withdraw-method').value;
+            const details = document.getElementById('details-input').value;
+
+            if (!amount || parseFloat(amount) < 10) {
+                const alert = document.getElementById('alert-box');
+                alert.innerText = 'Minimum withdrawal amount is $10';
+                alert.style.display = 'block';
+                return;
+            }
+            if (!details || !details.trim()) {
+                const alert = document.getElementById('alert-box');
+                alert.innerText = 'Please enter recipient details (UPI ID, Card, or Bank)';
+                alert.style.display = 'block';
+                return;
+            }
+
+            const res = await fetch('/withdraw', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ amount: parseFloat(amount), method, details: details.trim() })
+            });
+            const d = await res.json();
+            if (d.success) {
+                document.getElementById('success-title').innerText = 'Withdrawal Submitted';
+                document.getElementById('success-message').innerText = 'Request received. Processing in 1–3 business days.';
+                if (d.receipt) showReceipt(d.receipt);
+                else showReceipt({ type: 'WITHDRAWAL', amount: parseFloat(amount), newBalance: d.newBalance, method, recipient: method === 'UPI' ? details : '****' + details.slice(-4), status: 'PENDING', date: new Date(), referenceId: d.transactionId?.toString().slice(-8)?.toUpperCase() || '', id: d.transactionId });
+                document.getElementById('success-overlay').style.display = 'flex';
+            } else {
+                const alert = document.getElementById('alert-box');
+                alert.innerText = d.message || 'Withdrawal failed';
+                alert.style.display = 'block';
+            }
+        }
+
+        // History
+        async function loadHistory() {
+            const res = await fetch('/api/transactions', { credentials: 'include' });
+            const d = await res.json();
+            const list = document.getElementById('transaction-list');
+            if (d.success && d.transactions.length) {
+                list.innerHTML = d.transactions.map(t => `
+                    <div class="txn-card">
+                        <div class="txn-info">
+                            <div class="txn-type">
+                                <i class="fas fa-${t.type === 'DEPOSIT' ? 'arrow-down' : 'arrow-up'}" style="color: var(--${t.type === 'DEPOSIT' ? 'green' : 'red'})"></i>
+                                ${t.type} via ${t.method}
+                            </div>
+                            <div class="txn-date">${new Date(t.createdAt).toLocaleString()}</div>
+                        </div>
+                        <div style="text-align: right">
+                            <div class="txn-amt" style="color: var(--${t.type === 'DEPOSIT' ? 'green' : 'red'})">
+                                ${t.type === 'DEPOSIT' ? '+' : '-'}$${t.amount.toLocaleString()}
+                            </div>
+                            <span class="status-pill status-${t.status.toLowerCase()}">${t.status}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                list.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 50px;">No transactions found.</p>';
+            }
+        }
+
+        function showSuccess(title, msg, bal, receipt) {
+            document.getElementById('success-title').innerText = title;
+            document.getElementById('success-message').innerText = msg;
+            if (receipt) showReceipt(receipt);
+            else document.getElementById('receipt-balance').innerText = '$' + (bal || 0).toLocaleString(undefined, { minimumFractionDigits: 2 });
+            document.getElementById('success-overlay').style.display = 'flex';
+        }
+    </script>
+</body>
+
+</html>

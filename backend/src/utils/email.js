@@ -99,7 +99,7 @@ async function sendWelcomeEmail(toEmail, userName) {
               If you have any questions, feel free to reply to this email. Our support team is here to help!
             </p>
             <p style="margin: 10px 0 0 0;">
-              &copy; 2024 Advisor Elite. Built for professional traders.
+              &copy; 2026 Advisor Elite. Built for professional traders.
             </p>
           </div>
         </div>

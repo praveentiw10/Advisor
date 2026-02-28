@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ticker}} - Stock Quote | ADVISOR</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #020617;
+      --surface: rgba(15, 23, 42, 0.4);
+      --accent: #22d3ee;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --green: #4ade80;
+      --red: #fb7185;
+      --border: rgba(255, 255, 255, 0.06);
+      --nav-bg: rgba(2, 6, 23, 0.8);
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --surface: rgba(255, 255, 255, 0.8);
+      --accent: #0891b2;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: rgba(0, 0, 0, 0.08);
+      --nav-bg: rgba(248, 250, 252, 0.8);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(at 0% 0%, rgba(34, 211, 238, 0.05) 0, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(30, 27, 75, 0.2) 0, transparent 50%);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    [data-theme="light"] body {
+      background-image:
+        radial-gradient(at 0% 0%, rgba(8, 145, 178, 0.05) 0, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(226, 232, 240, 0.3) 0, transparent 50%);
+    }
+
+    /* Essential Navigation */
+    .nav-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--nav-bg);
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--accent);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: 1px;
+    }
+
+    .back-btn {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.2s;
+    }
+
+    .back-btn:hover {
+      color: var(--accent);
+    }
+
+    /* Main Container */
+    .page-container {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    /* Simple Hero */
+    .symbol-hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 40px;
+    }
+
+    .symbol-info h1 {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1.1;
+    }
+
+    .symbol-info p {
+      font-size: 16px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .price-info {
+      text-align: right;
+    }
+
+    .current-price {
+      font-size: 48px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: -2px;
+    }
+
+    .price-change {
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    /* Minimal Grid */
+    .stats-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 40px;
+    }
+
+    .stat-box {
+      background: var(--bg);
+      padding: 20px;
+      transition: background 0.2s;
+    }
+
+    .stat-box:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 16px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Chart Section */
+    .chart-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 40px;
+      backdrop-filter: blur(20px);
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .chart-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    #tradingview_widget {
+      height: 500px;
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    /* Actions Bar */
+    .actions-bar {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .btn {
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #020617;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -6px var(--accent);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+    }
+
+    .btn-outline:hover {
+      background: var(--border);
+      border-color: var(--text-muted);
+    }
+
+    .theme-toggle {
+      background: var(--border);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* News Section Simple */
+    .news-section {
+      border-top: 1px solid var(--border);
+      padding-top: 40px;
+    }
+
+    .news-section h2 {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 24px;
+    }
+
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .news-card {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .news-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      line-height: 1.4;
+      transition: color 0.2s;
+    }
+
+    .news-card:hover h3 {
+      color: var(--accent);
+    }
+
+    .news-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 12px;
+    }
+
+    @media (max-width: 768px) {
+      .symbol-hero {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+      }
+
+      .price-info {
+        text-align: left;
+      }
+
+      .nav-header {
+        padding: 15px 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="nav-header">
+    <a href="/" class="logo">
+      <i class="fa-solid fa-bolt-lightning"></i> ADVISOR
+    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <button onclick="toggleTheme()" class="theme-toggle" id="theme-btn" title="Toggle Theme">
+        <i id="theme-icon" class="fa-solid fa-moon"></i>
+      </button>
+      <a href="/home" class="back-btn">
+        <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+      </a>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <section class="symbol-hero">
+      <div class="symbol-info">
+        <p id="quote-exchange"
+          style="text-transform: uppercase; font-weight: 700; font-size: 12px; color: var(--accent);">Loading...</p>
+        <h1 id="quote-name">{{ticker}}</h1>
+        <p id="quote-industry">Market Analysis</p>
+      </div>
+      <div class="price-info">
+        <div class="current-price" id="quote-price">$--.--</div>
+        <div class="price-change" id="quote-change">--% (--.--)</div>
+      </div>
+    </section>
+
+    <section class="actions-bar">
+      <a href="/home?trade={{ticker}}" class="btn btn-primary">
+        <i class="fa-solid fa-cart-shopping"></i> Quick Trade
+      </a>
+      <button onclick="addToWatchlist()" class="btn btn-outline">
+        <i class="fa-solid fa-bookmark"></i> Save to Watchlist
+      </button>
+    </section>
+
+    <section class="stats-summary">
+      <div class="stat-box">
+        <div class="stat-label">Price Open</div>
+        <div class="stat-value" id="stat-open">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Today's High</div>
+        <div class="stat-value" id="stat-high">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Today's Low</div>
+        <div class="stat-value" id="stat-low">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Volume (24h)</div>
+        <div class="stat-value" id="stat-volume">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Prev. Close</div>
+        <div class="stat-value" id="stat-pc">—</div>
+      </div>
+    </section>
+
+    <section class="chart-section">
+      <div class="chart-header">
+        <div class="chart-title">REAL-TIME PERFORMANCE</div>
+        <div style="font-size: 11px; color: var(--green); font-weight: 800;"><i class="fa-solid fa-circle"
+            style="font-size: 8px;"></i> LIVE DATA</div>
+      </div>
+      <div id="tradingview_widget"></div>
+    </section>
+
+    <section class="news-section">
+      <h2>Latest Intelligence</h2>
+      <div class="news-grid" id="news-container">
+        <p style="color: var(--text-muted);">Scanning global news feeds...</p>
+      </div>
+    </section>
+  </main>
+
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+  <script>
+    const ticker = "{{ticker}}";
+    const finnhubSymbol = ticker === 'BTC' ? 'BINANCE:BTCUSDT' : ticker;
+    const tvSymbol = ticker === 'BTC' ? 'BINANCE:BTCUSDT' : 'NASDAQ:' + ticker;
+
+    async function fetchQuote() {
+      try {
+        const response = await fetch('/api/stock/' + encodeURIComponent(finnhubSymbol));
+        const q = await response.json();
+        if (q.c != null) {
+          const fmt = (n) => '$' + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          document.getElementById('quote-price').innerText = fmt(q.c);
+          const dp = q.dp ?? 0;
+          const d = q.d ?? 0;
+          const color = dp >= 0 ? 'var(--green)' : 'var(--red)';
+          document.getElementById('quote-change').innerHTML = `<span style="color:${color}">${dp >= 0 ? '+' : ''}${dp.toFixed(2)}% (${d.toFixed(2)})</span>`;
+
+          document.getElementById('stat-open').innerText = fmt(q.o);
+          document.getElementById('stat-high').innerText = fmt(q.h);
+          document.getElementById('stat-low').innerText = fmt(q.l);
+          document.getElementById('stat-pc').innerText = fmt(q.pc);
+          document.getElementById('stat-volume').innerText = q.v >= 1e6 ? (q.v / 1e6).toFixed(2) + 'M' : Number(q.v).toLocaleString();
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    async function fetchProfile() {
+      try {
+        const response = await fetch('/api/company-profile/' + encodeURIComponent(finnhubSymbol));
+        const p = await response.json();
+        if (p.name) {
+          document.getElementById('quote-name').innerText = p.name;
+          document.getElementById('quote-industry').innerText = p.finnhubIndustry || 'Market Analysis';
+          document.getElementById('quote-exchange').innerText = p.exchange || ticker;
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    async function fetchNews() {
+      try {
+        const response = await fetch('/api/news?symbol=' + encodeURIComponent(ticker === 'BTC' ? '' : ticker));
+        const data = await response.json();
+        const news = data.news || [];
+        const container = document.getElementById('news-container');
+        if (news.length) {
+          container.innerHTML = news.slice(0, 6).map(n => `
+                        <a href="${n.url}" target="_blank" class="news-card">
+                            <h3>${n.headline}</h3>
+                            <div class="news-meta">
+                                <span>${n.source}</span>
+                                <span>${new Date(n.datetime * 1000).toLocaleDateString()}</span>
+                            </div>
+                        </a>
+                    `).join('');
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    async function addToWatchlist() {
+      try {
+        const res = await fetch('/api/watchlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ symbol: ticker })
+        });
+        const data = await res.json();
+        alert(data.success ? `${ticker} added to watchlist` : (data.message || 'Already in watchlist'));
+      } catch (e) { alert('Action failed'); }
+    }
+
+    // Theme Management
+    function toggleTheme() {
+      const body = document.documentElement;
+      const currentTheme = body.getAttribute('data-theme') || 'dark';
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+      applyTheme(newTheme);
+      localStorage.setItem('theme', newTheme);
+
+      // Optional: reload page to refresh TradingView theme
+      // window.location.reload(); 
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      const icon = document.getElementById('theme-icon');
+      if (theme === 'light') {
+        icon.classList.replace('fa-moon', 'fa-sun');
+      } else {
+        icon.classList.replace('fa-sun', 'fa-moon');
+      }
+    }
+
+    // Load persisted theme
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(savedTheme);
+
+    // Keyboard Shortcut
+    document.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === 't' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        toggleTheme();
+      }
+    });
+
+    // Initialize
+    fetchQuote();
+    fetchProfile();
+    fetchNews();
+    setInterval(fetchQuote, 20000);
+
+    new TradingView.widget({
+      "autosize": true,
+      "symbol": tvSymbol,
+      "interval": "D",
+      "theme": savedTheme === 'light' ? 'light' : 'dark',
+      "style": "1",
+      "locale": "en",
+      "toolbar_bg": savedTheme === 'light' ? '#f8fafc' : "#020617",
+      "enable_publishing": false,
+      "hide_top_toolbar": false,
+      "hide_legend": false,
+      "save_image": false,
+      "container_id": "tradingview_widget"
+    });
+  </script>
+</body>
+
+</html>
